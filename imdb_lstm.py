@@ -1,3 +1,7 @@
+'''
+参考文章链接: http://frankchen.xyz/2017/12/18/How-to-Use-Word-Embedding-Layers-for-Deep-Learning-with-Keras/
+'''
+
 
 from __future__ import print_function
 
@@ -8,8 +12,9 @@ from keras.layers import LSTM
 import numpy as np
 import matplotlib.pyplot as plt
 
-
+# 只考虑最常见的20000个单词
 max_features = 20000
+# 大于80长度的句子后面将被截掉，不足80的补0  句子长度为80
 maxlen = 80  # cut texts after this number of words (among top max_features most common words)
 batch_size = 32
 
@@ -61,6 +66,7 @@ print(len(x_train), 'train sequences')
 print(len(x_test), 'test sequences')
 
 print('Pad sequences (samples x time)')
+# 转化成（len(x_train, maxlen)）的矩阵
 x_train = sequence.pad_sequences(x_train, maxlen=maxlen)
 x_test = sequence.pad_sequences(x_test, maxlen=maxlen)
 print('x_train shape:', x_train.shape)
@@ -68,6 +74,7 @@ print('x_test shape:', x_test.shape)
 
 print('Build model...')
 model = Sequential()
+# Embedding层只能作为模型的第一层，输入为20000维度，输出为128维度
 model.add(Embedding(max_features, 128))
 model.add(LSTM(128, dropout=0.2, recurrent_dropout=0.2))
 model.add(Dense(1, activation='sigmoid'))
@@ -80,14 +87,14 @@ model.compile(loss='binary_crossentropy',
 print('Train...')
 history = model.fit(x_train, y_train,
           batch_size=batch_size,
-          epochs=2,  # 15
+          epochs=15,  # 15
           validation_data=(x_test, y_test))
 score, acc = model.evaluate(x_test, y_test,
                             batch_size=batch_size)
 print('Test score:', score)
 print('Test accuracy:', acc)
 
-
+# 画出acc和loss的图
 # list all data in history
 print(history.history.keys())
 # summarize history for accuracy
